@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using NDde;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -110,7 +111,15 @@ namespace satpc32_dde_utils
 
                 Console.WriteLine("Click a satellite in SatPC32. You'll see lines appearing here when the selected sat is over the horizon.");
                 Console.WriteLine("Press CTRL-C to quit.");
-                satPC32Client.Run(cancellationTokenSource.Token);
+                try
+                {
+                    satPC32Client.Run(cancellationTokenSource.Token);
+                }
+                catch (DdeException ex)
+                {
+                    Console.WriteLine("Could not connect to SatPC32 - is it running? Full error message follows.");
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 
