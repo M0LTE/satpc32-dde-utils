@@ -100,7 +100,7 @@ namespace satpc32_dde_utils
 
                     if (options.EnableRigControl)
                     {
-                        SetRigFrequency(e, sdrConsoleController);
+                        SetRigFrequencyAndMode(e, sdrConsoleController);
                     }
 
                     if (!string.IsNullOrWhiteSpace(udpHost))
@@ -123,7 +123,17 @@ namespace satpc32_dde_utils
             }
         }
 
-        private static void SetRigFrequency(SatPC32DataReceivedArgs e, IRigController sdrConsoleController)
+        /// <summary>
+        /// Map of SatPC32 mode strings to <see cref="Mode"/> members
+        /// </summary>
+        private static readonly Dictionary<string, Mode> modeMap = new Dictionary<string, Mode>
+        {
+            { "FM", Mode.FM },
+            { "LSB", Mode.LSB },
+            { "USB", Mode.USB },
+        };
+
+        private static void SetRigFrequencyAndMode(SatPC32DataReceivedArgs e, IRigController sdrConsoleController)
         {
             // control an emulated TS-2000
             using (var timeoutTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(0.9)))
@@ -131,6 +141,21 @@ namespace satpc32_dde_utils
                 if (!sdrConsoleController.SetFrequencyHz(e.DownlinkFrequencyHz, timeoutTokenSource.Token))
                 {
                     Console.WriteLine("Warning, could not set rig frequency, continuing...");
+                }
+
+                if (!string.IsNullOrWhiteSpace(e.DownlinkMode))
+                {
+                    if (modeMap.TryGetValue(e.DownlinkMode, out Mode mode))
+                    {
+                        if (!sdrConsoleController.SetMode(mode, timeoutTokenSource.Token))
+                        {
+                            Console.WriteLine("Warning, could not set rig mode, continuing...");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Warning, unrecognised mode {e.DownlinkMode}");
+                    }
                 }
             }
         }

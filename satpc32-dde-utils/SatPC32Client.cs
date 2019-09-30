@@ -29,7 +29,17 @@ namespace satpc32_dde_utils
                             break;
                         }
 
-                        string satdata = client.Request("SatPcDdeItem", 60000);
+                        string satdata;
+
+                        try
+                        {
+                            satdata = client.Request("SatPcDdeItem", 60000);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // satpc32 has gone away
+                            continue;
+                        }
 
                         if (string.IsNullOrWhiteSpace(satdata))
                         {
@@ -85,7 +95,10 @@ namespace satpc32_dde_utils
                             }
                         }
 
-                        SatPC32DataReceived?.Invoke(this, new SatPC32DataReceivedArgs(satname, uplink_freq, uplink_mode, downlink_freq, downlink_mode, az, el));
+                        if (az != 0 && el != 0)
+                        {
+                            SatPC32DataReceived?.Invoke(this, new SatPC32DataReceivedArgs(satname, uplink_freq, uplink_mode, downlink_freq, downlink_mode, az, el));
+                        }
                     }
                     finally
                     {
