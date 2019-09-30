@@ -1,5 +1,5 @@
 # satpc32-dde-utils
-DDE utils for SatPC. Connects SatPC32 to a TS-2000 or SDR Console (via VSPE), and emits MacDoppler-format UDP datagrams containing pass updates.
+DDE utils for SatPC32. Connects SatPC32 to a TS-2000 or SDR Console (via VSPE), and emits MacDoppler-format UDP datagrams containing pass updates.
 
 Windows-only - requires .NET Framework 4.7.2.
 
